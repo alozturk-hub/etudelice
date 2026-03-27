@@ -20,6 +20,9 @@ CREATE TABLE tf_user(
    user_prenom VARCHAR(50) NOT NULL,
    user_mail VARCHAR(50) NOT NULL,
    user_password VARCHAR(50) NOT NULL,
+   user_telephone VARCHAR(50) NOT NULL,
+   user_age INT,
+   user_description VARCHAR(100),
    role_id INT NOT NULL,
    PRIMARY KEY(user_id),
    FOREIGN KEY(role_id) REFERENCES tf_role(role_id)
