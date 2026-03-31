@@ -59,6 +59,17 @@
                         Contact
                     </a>
 
+                    <!-- Bouton de connexion si non connecté -->
+                    <a href="#" id="loginBtn" onclick="openLoginModal(event)"
+                        class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5.121 17.804A9 9 0 1118.88 6.197M15 11l-3-3m0 0l-3 3m3-3v12">
+                            </path>
+                        </svg>
+                        Connexion
+                    </a>
+
                     <!-- Profil utilisateur si connecté -->
                     <div id="userProfile" style="display: none;" class="flex items-center gap-3 ml-4 pl-4 border-l border-gray-300">
                         <div class="text-right">
@@ -384,8 +395,58 @@
         </div>
     </div>
 
+    <!-- Modal de connexion -->
+    <div id="loginModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Connexion</h3>
+            <form id="loginForm" method="POST" action="controller/loginController.php">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
+                        <input type="email" name="email" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="jean.dupont@exemple.fr">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Mot de passe *</label>
+                        <input type="password" name="password" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="••••••••">
+                    </div>
+
+                    <div id="loginError" style="display: none;" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeLoginModal()"
+                            class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
+                            Annuler
+                        </button>
+                        <button type="submit"
+                            class="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                            Se connecter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        // ==================== VARIABLES GLOBALES ====================
         let currentInscriptionType = '';
+        let currentUserId = null;
+        let currentUserRole = null; // 1 = usager, 2 = cuisinier
+        let currentUserData = {};
+
+        // Fonction pour vérifier les droits
+        function hasRole(roleId) {
+            return currentUserRole === roleId;
+        }
+
+        function isAuthenticated() {
+            return currentUserId !== null;
+        }
 
         // Vérifier si l'utilisateur est connecté au chargement de la page
         function checkSession() {
@@ -393,16 +454,37 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.logged_in) {
+                        // Stocker les informations utilisateur dans les variables globales
+                        currentUserId = data.user_id;
+                        currentUserRole = data.user_role;
+                        currentUserData = {
+                            user_id: data.user_id,
+                            user_nom: data.user_nom,
+                            user_prenom: data.user_prenom,
+                            user_mail: data.user_mail,
+                            user_role: data.user_role
+                        };
+
+                        // Masquer le bouton de connexion et afficher le profil
+                        document.getElementById('loginBtn').style.display = 'none';
                         document.getElementById('userProfile').style.display = 'flex';
                         document.getElementById('userFullName').textContent = data.user_prenom + ' ' + data.user_nom;
                         document.getElementById('userEmail').textContent = data.user_mail;
+                    } else {
+                        // Afficher le bouton de connexion et masquer le profil
+                        currentUserId = null;
+                        currentUserRole = null;
+                        currentUserData = {};
+
+                        document.getElementById('loginBtn').style.display = 'flex';
+                        document.getElementById('userProfile').style.display = 'none';
                     }
                 })
-                .catch(error => console.log('Sessio check error:', error));
+                .catch(error => console.log('Session check error:', error));
         }
 
         // Déconnexion
-        function logout() {
+        function logout(event) {
             event.preventDefault();
             fetch('controller/logout.php')
                 .then(response => response.json())
@@ -441,6 +523,7 @@
             initProfileMenu();
         });
 
+        // ==================== MODAL D'INSCRIPTION ====================
         function openModal(type) {
             currentInscriptionType = type;
 
@@ -497,10 +580,65 @@
             });
         });
 
-        // Fermer la modal en cliquant à l'extérieur
+        // Fermer la modal d'inscription en cliquant à l'extérieur
         document.getElementById('inscriptionModal').addEventListener('click', function (e) {
             if (e.target === this) {
                 closeModal();
+            }
+        });
+
+        // ==================== MODAL DE CONNEXION ====================
+        function openLoginModal(event) {
+            event.preventDefault();
+            const modal = document.getElementById('loginModal');
+            modal.classList.add('active');
+            // Réinitialiser le formulaire et le message d'erreur
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('loginModal');
+            modal.classList.remove('active');
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // Gérer la soumission du formulaire de connexion
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('controller/loginController.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Connexion réussie ! Bienvenue 🎉');
+                    closeLoginModal();
+                    // Rediriger vers l'accueil après 1 seconde
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    // Afficher le message d'erreur
+                    document.getElementById('loginError').textContent = data.message;
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loginError').textContent = 'Une erreur est survenue lors de la connexion';
+                document.getElementById('loginError').style.display = 'block';
+            });
+        });
+
+        // Fermer la modal de connexion en cliquant à l'extérieur
+        document.getElementById('loginModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeLoginModal();
             }
         });
     </script>
