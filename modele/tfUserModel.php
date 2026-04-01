@@ -82,4 +82,16 @@ class TfUserModel
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Récupérer tous les cuisiniers (role_id = 2)
+     */
+    public function getCuisiniers()
+    {
+        $sql = "SELECT user_id, user_nom, user_prenom, user_specialite FROM tf_user WHERE role_id = 2 ORDER BY user_prenom, user_nom";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
