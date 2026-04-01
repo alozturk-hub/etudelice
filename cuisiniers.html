@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nos Cuisiniers - Étudélice</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
@@ -37,7 +46,39 @@
                         </svg>
                         Contact
                     </a>
-                </nav>
+
+                    <!-- Bouton de connexion si non connecté -->
+                    <a href="#" id="loginBtn" onclick="openLoginModal(event)"
+                        class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5.121 17.804A9 9 0 1118.88 6.197M15 11l-3-3m0 0l-3 3m3-3v12">
+                            </path>
+                        </svg>
+                        Connexion
+                    </a>
+
+                    <!-- Profil utilisateur si connecté -->
+                    <div id="userProfile" style="display: none;" class="flex items-center gap-3 ml-4 pl-4 border-l border-gray-300">
+                        <div class="text-right">
+                            <p id="userFullName" class="font-semibold text-gray-900"></p>
+                            <p id="userEmail" class="text-sm text-gray-600"></p>
+                        </div>
+                        <div class="relative">
+                            <button id="profileMenuBtn" class="flex items-center justify-center w-10 h-10 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="profileMenu" class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg hidden z-10">
+                                <a href="#" onclick="logout(event)" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                    Déconnexion
+                                </a>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
     </header>
@@ -58,52 +99,65 @@
             <!-- Résultats -->
             <div class="mb-6">
                 <p class="text-gray-600">
-                    <span class="font-semibold text-gray-900">3</span> cuisiniers disponibles
+                    <span class="font-semibold text-gray-900" id="cuisiniersCount">0</span> cuisiniers disponibles
                 </p>
             </div>
 
+            <!-- Loading state -->
+            <div id="loadingState" class="text-center py-12">
+                <div class="inline-block">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+                </div>
+                <p class="text-gray-600 mt-4">Chargement des cuisiniers...</p>
+            </div>
+
             <!-- Grille de cuisiniers -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Cuisinier 1 -->
-                <a href="cuisinier-detail.html?id=1" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1756715743380-d86e3eecbe83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhc2lhbiUyMGZlbWFsZSUyMGNoZWYlMjBwb3J0cmFpdHxlbnwxfHx8fDE3NzQ0NzA0NjZ8MA&ixlib=rb-4.1.0&q=80&w=1080" alt="Sophie Chen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Sophie Chen</h3>
-                        <p class="text-gray-600 text-sm mb-3">22 ans</p>
-                        <p class="text-gray-700 line-clamp-2">Étudiante passionnée par la cuisine et les plats équilibrés. Je privilégie les produits frais et de saison pour créer des repas sains et savoureux.</p>
-                    </div>
-                </a>
+            <div id="cuisiniersContainer" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+            </div>
 
-                <!-- Cuisinier 2 -->
-                <a href="cuisinier-detail.html?id=2" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1647483684830-7ddde27dcf4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx5b3VuZyUyMG1hbGUlMjBjaGVmJTIwc21pbGluZ3xlbnwxfHx8fDE3NzQ0NzA0NjZ8MA&ixlib=rb-4.1.0&q=80&w=1080" alt="Lucas Martin" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Lucas Martin</h3>
-                        <p class="text-gray-600 text-sm mb-3">24 ans</p>
-                        <p class="text-gray-700 line-clamp-2">Chef en devenir spécialisé dans la cuisine traditionnelle revisitée. J'utilise uniquement des produits bio et locaux pour garantir qualité et fraîcheur.</p>
-                    </div>
-                </a>
-
-                <!-- Cuisinier 3 -->
-                <a href="cuisinier-detail.html?id=3" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1496811425508-6d7ebb7ff32c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZnJpY2FuJTIwZmVtYWxlJTIwY2hlZiUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NzQ0NzA0NjZ8MA&ixlib=rb-4.1.0&q=80&w=1080" alt="Aïcha Diallo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Aïcha Diallo</h3>
-                        <p class="text-gray-600 text-sm mb-3">23 ans</p>
-                        <p class="text-gray-700 line-clamp-2">Passionnée de cuisine et des régimes spéciaux. Je crée des plats savoureux adaptés à tous les besoins alimentaires.</p>
-                    </div>
-                </a>
-
-                </a>
+            <!-- Error state -->
+            <div id="errorState" class="text-center py-12 hidden">
+                <p class="text-red-600">Erreur lors du chargement des cuisiniers</p>
             </div>
         </div>
     </main>
+
+    <!-- Modal de connexion -->
+    <div id="loginModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Connexion</h3>
+            <form id="loginForm" method="POST" action="controller/loginController.php">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
+                        <input type="email" name="email" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="jean.dupont@exemple.fr">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Mot de passe *</label>
+                        <input type="password" name="password" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="••••••••">
+                    </div>
+
+                    <div id="loginError" style="display: none;" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeLoginModal()"
+                            class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
+                            Annuler
+                        </button>
+                        <button type="submit"
+                            class="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                            Se connecter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white mt-16">
@@ -144,5 +198,203 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // ==================== VARIABLES GLOBALES ====================
+        let currentUserId = null;
+        let currentUserRole = null;
+        let currentUserData = {};
+
+        // Vérifier si l'utilisateur est connecté au chargement de la page
+        function checkSession() {
+            fetch('controller/checkSession.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.logged_in) {
+                        // Stocker les informations utilisateur dans les variables globales
+                        currentUserId = data.user_id;
+                        currentUserRole = data.user_role;
+                        currentUserData = {
+                            user_id: data.user_id,
+                            user_nom: data.user_nom,
+                            user_prenom: data.user_prenom,
+                            user_mail: data.user_mail,
+                            user_role: data.user_role
+                        };
+
+                        // Masquer le bouton de connexion et afficher le profil
+                        document.getElementById('loginBtn').style.display = 'none';
+                        document.getElementById('userProfile').style.display = 'flex';
+                        document.getElementById('userFullName').textContent = data.user_prenom + ' ' + data.user_nom;
+                        document.getElementById('userEmail').textContent = data.user_mail;
+                    } else {
+                        // Afficher le bouton de connexion et masquer le profil
+                        currentUserId = null;
+                        currentUserRole = null;
+                        currentUserData = {};
+
+                        document.getElementById('loginBtn').style.display = 'flex';
+                        document.getElementById('userProfile').style.display = 'none';
+                    }
+                })
+                .catch(error => console.log('Session check error:', error));
+        }
+
+        // Déconnexion
+        function logout(event) {
+            event.preventDefault();
+            fetch('controller/logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                })
+                .catch(error => console.log('Logout error:', error));
+        }
+
+        // Gérer le menu déroulant du profil
+        function initProfileMenu() {
+            const profileMenuBtn = document.getElementById('profileMenuBtn');
+            const profileMenu = document.getElementById('profileMenu');
+
+            if (profileMenuBtn && profileMenu) {
+                // Afficher/masquer le menu au clic sur le bouton
+                profileMenuBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    profileMenu.classList.toggle('hidden');
+                });
+
+                // Fermer le menu quand on clique en dehors
+                document.addEventListener('click', (e) => {
+                    if (!profileMenuBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                        profileMenu.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // ==================== MODAL DE CONNEXION ====================
+        function openLoginModal(event) {
+            event.preventDefault();
+            const modal = document.getElementById('loginModal');
+            modal.classList.add('active');
+            // Réinitialiser le formulaire et le message d'erreur
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('loginModal');
+            modal.classList.remove('active');
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // Gérer la soumission du formulaire de connexion
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSession();
+            initProfileMenu();
+            chargerCuisiniers();
+
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch('controller/loginController.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Connexion réussie ! Bienvenue 🎉');
+                        closeLoginModal();
+                        // Rediriger vers la page après 1 seconde
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        // Afficher le message d'erreur
+                        document.getElementById('loginError').textContent = data.message;
+                        document.getElementById('loginError').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loginError').textContent = 'Une erreur est survenue lors de la connexion';
+                    document.getElementById('loginError').style.display = 'block';
+                });
+            });
+
+            // Fermer la modal de connexion en cliquant à l'extérieur
+            document.getElementById('loginModal').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    closeLoginModal();
+                }
+            });
+        });
+
+        // ==================== CHARGEMENT DES CUISINIERS ====================
+        async function chargerCuisiniers() {
+            try {
+                const response = await fetch('controller/getCuisiniersController.php');
+                const result = await response.json();
+
+                if (result.success && result.data.length > 0) {
+                    afficherCuisiniers(result.data);
+                    document.getElementById('loadingState').classList.add('hidden');
+                    document.getElementById('cuisiniersContainer').classList.remove('hidden');
+                } else {
+                    afficherErreur('Aucun cuisinier trouvé');
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement:', error);
+                afficherErreur('Erreur lors du chargement des cuisiniers');
+            }
+        }
+
+        function afficherCuisiniers(cuisiniers) {
+            const container = document.getElementById('cuisiniersContainer');
+            const count = document.getElementById('cuisiniersCount');
+            
+            count.textContent = cuisiniers.length;
+            container.innerHTML = '';
+
+            cuisiniers.forEach(cuisinier => {
+                const card = document.createElement('a');
+                card.href = `cuisinier-detail.html?id=${cuisinier.user_id}`;
+                card.className = 'bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group';
+                
+                const specialiteHtml = cuisinier.user_specialite 
+                    ? `<p class="text-emerald-600 text-sm font-semibold mb-2">${cuisinier.user_specialite}</p>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="relative h-64 overflow-hidden bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+                        <div class="text-white text-center">
+                            <div class="text-5xl mb-2">👨‍🍳</div>
+                            <p class="text-emerald-100">${cuisinier.user_prenom} ${cuisinier.user_nom}</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">${cuisinier.user_prenom} ${cuisinier.user_nom}</h3>
+                        ${specialiteHtml}
+                        <p class="text-gray-600 text-sm">
+                            ${cuisinier.user_specialite || 'Cuisinier étudiant'}
+                        </p>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function afficherErreur(message) {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+            document.getElementById('errorState').innerHTML = `<p class="text-red-600">${message}</p>`;
+        }
+    </script>
 </body>
 </html>
