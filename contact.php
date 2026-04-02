@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<?php session_start(); ?>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -18,26 +19,37 @@
                     <span class="text-2xl font-bold text-emerald-600">Étudélice</span>
                 </a>
 
-                <nav class="hidden md:flex gap-8">
-                    <a href="index.html" class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
-                        Accueil
-                    </a>
-                    <a href="cuisiniers.html" class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                        Nos Cuisiniers
-                    </a>
-                    <a href="contact.html" class="flex items-center gap-2 text-emerald-600 font-semibold">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                        </svg>
-                        Contact
-                    </a>
-                </nav>
+                <div class="hidden md:flex items-center gap-8">
+                    <nav class="flex gap-8">
+                        <a href="index.html" class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            Accueil
+                        </a>
+                        <a href="cuisiniers.html" class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            Nos Cuisiniers
+                        </a>
+                        <a href="contact.php" class="flex items-center gap-2 text-emerald-600 font-semibold">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                            Contact
+                        </a>
+                    </nav>
+
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <div class="flex items-center gap-4 ml-8 border-l border-gray-200 pl-8">
+                            <span class="text-gray-700">Bonjour, <?php echo htmlspecialchars($_SESSION['user_prenom'] . ' ' . $_SESSION['user_nom']); ?></span>
+                            <a href="controller/logout.php" class="text-emerald-600 hover:text-emerald-700 font-medium">Déconnexion</a>
+                        </div>
+                    <?php else: ?>
+                        <a href="login.html" class="text-emerald-600 hover:text-emerald-700 font-medium ml-8 border-l border-gray-200 pl-8">Connexion</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </header>
@@ -107,6 +119,14 @@
                                 </button>
                             </div>
                         </form>
+
+                        <!-- Success Message -->
+                        <div id="success-message" class="hidden mt-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg flex items-center gap-3">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-semibold">Message envoyé avec succès !</span>
+                        </div>
                     </div>
                 </div>
 
@@ -236,7 +256,7 @@
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="index.html" class="hover:text-emerald-500 transition-colors">Accueil</a></li>
                         <li><a href="cuisiniers.html" class="hover:text-emerald-500 transition-colors">Nos Cuisiniers</a></li>
-                        <li><a href="contact.html" class="hover:text-emerald-500 transition-colors">Contact</a></li>
+                        <li><a href="contact.php" class="hover:text-emerald-500 transition-colors">Contact</a></li>
                     </ul>
                 </div>
 
@@ -264,8 +284,17 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
             
-            alert(`Message envoyé avec succès !\n\nNom: ${data.name}\nEmail: ${data.email}\nSujet: ${data.subject}\n\nCeci est une maquette - aucun message réel n'a été envoyé.`);
+            // Show success message
+            const successMessage = document.getElementById('success-message');
+            successMessage.classList.remove('hidden');
+            
+            // Reset form
             form.reset();
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 5000);
         }
     </script>
 </body>
