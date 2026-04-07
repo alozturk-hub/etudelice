@@ -431,36 +431,38 @@
             const totalPrice = selectedPlats.reduce((sum, plat) => sum + plat.prix, 0);
 
             const order = {
-                cuisinier: {
-                    id: cuisinierData.user_id,
-                    name: cuisinierData.user_prenom + ' ' + cuisinierData.user_nom,
-                    email: cuisinierData.user_mail
-                },
-                client: {
-                    id: currentUserId,
-                    name: currentUserData.user_prenom + ' ' + currentUserData.user_nom,
-                    email: currentUserData.user_mail
-                },
+                cuisinierId: cuisinierData.user_id,
                 plats: selectedPlats.map(p => ({
                     id: p.id,
-                    libelle: p.libelle,
-                    prix: p.prix
-                })),
-                totalQuantity: selectedPlats.length,
-                totalPrice: totalPrice,
-                date: new Date().toISOString()
+                    quantite: 1
+                }))
             };
 
-            console.log('Commande:', order);
+            console.log('Envoi de la commande:', order);
 
-            // TODO : envoyer la commande au serveur
-            // fetch('controller/commandeController.php', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(order)
-            // }).then(...)
-
-            alert(`Commande simulée :\nCuisinier: ${order.cuisinier.name}\nPlats: ${order.plats.map(p => p.libelle).join(', ')}\nTotal: ${totalPrice.toFixed(2)} €\n\nFonctionnalité de commande à implémenter.`);
+            // Envoyer la commande au serveur
+            fetch('controller/createReservationController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(order)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ Commande validée !\n\nCuisinier: ${cuisinierData.user_prenom} ${cuisinierData.user_nom}\nPlats: ${selectedPlats.map(p => p.libelle).join(', ')}\nTotal: ${totalPrice.toFixed(2)} €\n\nMerci de votre commande !`);
+                    
+                    // Réinitialiser la sélection
+                    selectedPlats = [];
+                    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                    refreshSummary();
+                } else {
+                    alert('❌ Erreur lors de la création de la commande:\n' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('❌ Une erreur est survenue lors de l\'envoi de la commande.');
+            });
         }
 
         // ================================================================
