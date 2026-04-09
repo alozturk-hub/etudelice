@@ -84,6 +84,38 @@ class TfUserModel
     }
 
     /**
+     * Mettre à jour un utilisateur
+     */
+    public function updateUser($id, $nom, $prenom, $mail, $telephone, $specialite = null, $password = null)
+    {
+        $fields = [
+            'user_nom' => $nom,
+            'user_prenom' => $prenom,
+            'user_mail' => $mail,
+            'user_telephone' => $telephone,
+            'user_specialite' => $specialite,
+            'user_id' => $id
+        ];
+
+        $sql = "UPDATE tf_user SET
+                    user_nom = :user_nom,
+                    user_prenom = :user_prenom,
+                    user_mail = :user_mail,
+                    user_telephone = :user_telephone,
+                    user_specialite = :user_specialite";
+
+        if (!empty($password)) {
+            $sql .= ", user_password = :user_password";
+            $fields['user_password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
+        $sql .= " WHERE user_id = :user_id";
+
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute($fields);
+    }
+
+    /**
      * Récupérer tous les cuisiniers (role_id = 2)
      */
     public function getCuisiniers()
