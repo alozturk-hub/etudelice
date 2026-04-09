@@ -92,7 +92,10 @@ class TfReservationModel
      */
     public function getReservationById($reservationId)
     {
-        $sql = "SELECT * FROM ta_reservation WHERE reservation_id = :id";
+        $sql = "SELECT res.*, st.status_libelle as reservation_status_text 
+                FROM ta_reservation res 
+                LEFT JOIN tf_status st ON res.reservation_statut = st.status_id 
+                WHERE reservation_id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $reservationId]);
 
@@ -132,10 +135,12 @@ class TfReservationModel
                     cu.user_mail as cuisinier_mail,
                     cl.user_prenom as client_prenom,
                     cl.user_nom as client_nom,
-                    cl.user_mail as client_mail
+                    cl.user_mail as client_mail,
+                    st.status_libelle as reservation_status_text
                 FROM ta_reservation res
                 JOIN tf_user cu ON res.user_id_1 = cu.user_id
                 JOIN tf_user cl ON res.user_id = cl.user_id
+                LEFT JOIN tf_status st ON res.reservation_statut = st.status_id
                 WHERE res.user_id = :user_id OR res.user_id_1 = :user_id
                 ORDER BY res.reservation_date DESC";
 
@@ -157,10 +162,12 @@ class TfReservationModel
                     cu.user_mail as cuisinier_mail,
                     cl.user_prenom as client_prenom,
                     cl.user_nom as client_nom,
-                    cl.user_mail as client_mail
+                    cl.user_mail as client_mail,
+                    st.status_libelle as reservation_status_text
                 FROM ta_reservation res
                 JOIN tf_user cu ON res.user_id_1 = cu.user_id
                 JOIN tf_user cl ON res.user_id = cl.user_id
+                LEFT JOIN tf_status st ON res.reservation_statut = st.status_id
                 WHERE res.user_id_1 = :cuisinier_id
                 ORDER BY res.reservation_date DESC";
 

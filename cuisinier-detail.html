@@ -64,6 +64,17 @@
                         Connexion
                     </a>
 
+                    <!-- Bouton Vos commandes si connecté -->
+                    <a href="commande.html" id="commandesBtn" style="display:none;"
+                        class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                            </path>
+                        </svg>
+                        Vos commandes
+                    </a>
+
                     <!-- Profil utilisateur (connecté) -->
                     <div id="userProfile" style="display:none;" class="flex items-center gap-3 ml-4 pl-4 border-l border-gray-300">
                         <div class="text-right">
@@ -79,11 +90,14 @@
                                     </path>
                                 </svg>
                             </button>
-                            <div id="profileMenu" class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg hidden z-10">
-                                <a href="profil.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
-                                    Profil
+                            <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden z-10">
+                                <a href="profil.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                    Mon profil
                                 </a>
-                                <a href="#" onclick="logout(event)" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                                <a href="commande.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    Mes commandes
+                                </a>
+                                <a href="#" onclick="logout(event)" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg border-t">
                                     Déconnexion
                                 </a>
                             </div>
@@ -379,9 +393,23 @@
                                 <p class="text-gray-600 mt-1">${p.plat_description}</p>
                             </div>
                         </div>
-                        <p class="text-emerald-600 font-bold text-xl">
-                            ${parseFloat(p.plat_prix).toFixed(2).replace('.', ',')} €
-                        </p>
+                        <div class="flex items-center justify-between">
+                            <p class="text-emerald-600 font-bold text-xl">
+                                ${parseFloat(p.plat_prix).toFixed(2).replace('.', ',')} €
+                            </p>
+                            <!-- Contrôles de quantité -->
+                            <div id="quantity_controls_${p.plat_id}" class="flex items-center gap-2" style="display: none;">
+                                <button type="button" onclick="decrementQuantity(${p.plat_id})"
+                                    class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 font-bold">
+                                    -
+                                </button>
+                                <span id="quantity_${p.plat_id}" class="w-8 text-center font-semibold">1</span>
+                                <button type="button" onclick="incrementQuantity(${p.plat_id})"
+                                    class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 font-bold">
+                                    +
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>`;
         }
@@ -391,20 +419,48 @@
         // ================================================================
         function togglePlat(platId, platLibelle, platPrix) {
             const checkbox = document.getElementById(`plat_${platId}`);
+            const quantityControls = document.getElementById(`quantity_controls_${platId}`);
             const isChecked = checkbox.checked;
 
             if (isChecked) {
-                selectedPlats.push({ id: platId, libelle: platLibelle, prix: platPrix });
+                // Ajouter le plat avec quantité 1
+                selectedPlats.push({ id: platId, libelle: platLibelle, prix: platPrix, quantite: 1 });
+                quantityControls.style.display = 'flex';
+                document.getElementById(`quantity_${platId}`).textContent = '1';
             } else {
+                // Retirer le plat
                 selectedPlats = selectedPlats.filter(p => p.id !== platId);
+                quantityControls.style.display = 'none';
             }
 
             refreshSummary();
         }
 
+        function incrementQuantity(platId) {
+            const plat = selectedPlats.find(p => p.id === platId);
+            if (plat) {
+                plat.quantite++;
+                document.getElementById(`quantity_${platId}`).textContent = plat.quantite;
+                refreshSummary();
+            }
+        }
+
+        function decrementQuantity(platId) {
+            const plat = selectedPlats.find(p => p.id === platId);
+            if (plat && plat.quantite > 1) {
+                plat.quantite--;
+                document.getElementById(`quantity_${platId}`).textContent = plat.quantite;
+                refreshSummary();
+            } else if (plat && plat.quantite === 1) {
+                // Si quantité = 1 et on décrémente, on décoche le plat
+                document.getElementById(`plat_${platId}`).checked = false;
+                togglePlat(platId, plat.libelle, plat.prix);
+            }
+        }
+
         function refreshSummary() {
-            const totalQty = selectedPlats.length;
-            const totalPrice = selectedPlats.reduce((sum, plat) => sum + plat.prix, 0);
+            const totalQty = selectedPlats.reduce((sum, plat) => sum + plat.quantite, 0);
+            const totalPrice = selectedPlats.reduce((sum, plat) => sum + (plat.prix * plat.quantite), 0);
 
             document.getElementById('totalQtyLabel').textContent =
                 'Total : ' + totalQty + ' plat' + (totalQty > 1 ? 's' : '');
@@ -430,13 +486,13 @@
                 return;
             }
 
-            const totalPrice = selectedPlats.reduce((sum, plat) => sum + plat.prix, 0);
+            const totalPrice = selectedPlats.reduce((sum, plat) => sum + (plat.prix * plat.quantite), 0);
 
             const order = {
                 cuisinierId: cuisinierData.user_id,
                 plats: selectedPlats.map(p => ({
                     id: p.id,
-                    quantite: 1
+                    quantite: p.quantite
                 }))
             };
 
@@ -451,7 +507,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`✅ Commande validée !\n\nCuisinier: ${cuisinierData.user_prenom} ${cuisinierData.user_nom}\nPlats: ${selectedPlats.map(p => p.libelle).join(', ')}\nTotal: ${totalPrice.toFixed(2)} €\n\nMerci de votre commande !`);
+                    alert(`✅ Commande validée !\n\nCuisinier: ${cuisinierData.user_prenom} ${cuisinierData.user_nom}\nPlats: ${selectedPlats.map(p => `${p.libelle} (x${p.quantite})`).join(', ')}\nTotal: ${totalPrice.toFixed(2)} €\n\nMerci de votre commande !`);
                     
                     // Réinitialiser la sélection
                     selectedPlats = [];
@@ -482,12 +538,14 @@
                         currentUserId   = data.user_id;
                         currentUserRole = data.user_role;
                         currentUserData = data;
-                        document.getElementById('loginBtn').style.display    = 'none';
+                        document.getElementById('loginBtn').style.display     = 'none';
+                        document.getElementById('commandesBtn').style.display = 'flex';
                         document.getElementById('userProfile').style.display = 'flex';
                         document.getElementById('userFullName').textContent  = data.user_prenom + ' ' + data.user_nom;
                         document.getElementById('userEmail').textContent     = data.user_mail;
                     } else {
-                        document.getElementById('loginBtn').style.display    = 'flex';
+                        document.getElementById('loginBtn').style.display     = 'flex';
+                        document.getElementById('commandesBtn').style.display = 'none';
                         document.getElementById('userProfile').style.display = 'none';
                     }
                 })

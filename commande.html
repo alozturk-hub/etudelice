@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Réservations - Étudélice</title>
+    <title>Mes Commandes - Étudélice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .modal {
-            display: none;
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
         }
-
-        .modal.active {
-            display: flex;
-        }
+        .status-pending { background-color: #fef08a; color: #854d0e; }
+        .status-accepted { background-color: #dcfce7; color: #166534; }
+        .status-completed { background-color: #d1fae5; color: #065f46; }
     </style>
 </head>
 <body class="bg-gray-50">
+
     <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,7 +35,7 @@
                 </a>
 
                 <nav class="hidden md:flex gap-8 items-center">
-                    <a href="index.html" class="flex items-center gap-2 text-gray-700 font-semibold">
+                    <a href="index.html" class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -38,8 +43,7 @@
                         </svg>
                         Accueil
                     </a>
-                    <a href="cuisiniers.html"
-                        class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
+                    <a href="cuisiniers.html" class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -47,34 +51,13 @@
                         </svg>
                         Nos Cuisiniers
                     </a>
-                    <a href="contact.php"
-                        class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
+                    <a href="contact.php" class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
                             </path>
                         </svg>
                         Contact
-                    </a>
-
-                    <!-- Bouton de connexion si non connecté -->
-                    <a href="#" id="loginBtn" onclick="openLoginModal(event)"
-                        class="flex items-center gap-2 text-gray-700 hover:text-emerald-600 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5.121 17.804A9 9 0 1118.88 6.197M15 11l-3-3m0 0l-3 3m3-3v12">
-                            </path>
-                        </svg>
-                        Connexion
-                    </a>
-                  <a href="commande.html"
-                        class="flex items-center gap-2 text-emerald-600 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
-                        </svg>
-                        Vos commandes
                     </a>
 
                     <!-- Profil utilisateur si connecté -->
@@ -91,8 +74,14 @@
                                     </path>
                                 </svg>
                             </button>
-                            <div id="profileMenu" class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg hidden z-10">
-                                <a href="#" onclick="logout(event)" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden z-10">
+                                <a href="profil.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                    Mon profil
+                                </a>
+                                <a href="commande.html" class="block px-4 py-2 text-emerald-600 font-semibold hover:bg-gray-100">
+                                    Mes commandes
+                                </a>
+                                <a href="#" onclick="logout(event)" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg border-t">
                                     Déconnexion
                                 </a>
                             </div>
@@ -103,118 +92,316 @@
         </div>
     </header>
 
-
+    <!-- Main Content -->
     <main>
-        <section class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-16">
-            <div class="max-w-7xl mx-auto px-4">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Mes Réservations</h1>
-                <p class="text-xl text-emerald-100 max-w-2xl">
-                    Consultez toutes vos réservations.
-                </p>
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold mb-2">Mes Commandes</h1>
+                <p class="text-emerald-100">Consultez vos commandes auprès des cuisiniers</p>
             </div>
         </section>
 
-        <div class="max-w-7xl mx-auto px-4 py-12">
-            <div class="mb-6">
-                <p class="text-gray-600">
-                    <span class="font-semibold text-gray-900" id="reservationsCount">0</span> réservations
-                </p>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- État : chargement -->
+            <div id="loadingState" class="flex flex-col items-center justify-center py-24 gap-4">
+                <svg class="w-10 h-10 text-emerald-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                <p class="text-gray-500 text-lg">Chargement de vos commandes…</p>
             </div>
 
-            <div id="loadingState" class="text-center py-12">
-                <div class="inline-block">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+            <!-- État : aucune réservation -->
+            <div id="emptyState" class="hidden text-center py-16">
+                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Aucune commande</h2>
+                <p class="text-gray-600 mb-6">Vous n'avez pas encore passé de commande.</p>
+                <a href="cuisiniers.html" class="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                    Découvrir nos cuisiniers
+                </a>
+            </div>
+
+            <!-- État : réservations -->
+            <div id="contentState" class="hidden">
+                <!-- Filtres -->
+                <div class="mb-6 flex gap-2 flex-wrap">
+                    <button onclick="filterReservations('all')" class="filter-btn px-4 py-2 rounded-full bg-emerald-600 text-white font-semibold transition-colors" data-filter="all">
+                        Toutes
+                    </button>
+                    <button onclick="filterReservations(1)" class="filter-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold transition-colors" data-filter="1">
+                        En attente
+                    </button>
+                    <button onclick="filterReservations(2)" class="filter-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold transition-colors" data-filter="2">
+                        Acceptée
+                    </button>
+                    <button onclick="filterReservations(3)" class="filter-btn px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold transition-colors" data-filter="3">
+                        Complétée
+                    </button>
                 </div>
-                <p class="text-gray-600 mt-4">Chargement des réservations...</p>
-            </div>
 
-            <div id="reservationsContainer" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
-
-            <div id="errorState" class="text-center py-12 hidden">
-                <p class="text-red-600">Erreur lors du chargement des réservations</p>
+                <!-- Liste des réservations -->
+                <div id="reservationsList" class="space-y-4"></div>
             </div>
         </div>
     </main>
 
-<script>
-// variables globales
-let currentUserId = null;
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                            </path>
+                        </svg>
+                        <span class="text-2xl font-bold">Étudélice</span>
+                    </div>
+                    <p class="text-gray-400 max-w-md">La plateforme qui met en relation particuliers et étudiants cuisiniers pour des repas faits maison, sains et délicieux.</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold mb-4">Navigation</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-emerald-500 transition-colors">Accueil</a></li>
+                        <li><a href="cuisiniers.html" class="hover:text-emerald-500 transition-colors">Nos Cuisiniers</a></li>
+                        <li><a href="contact.php" class="hover:text-emerald-500 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold mb-4">Informations</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>À propos</li>
+                        <li>Devenir cuisinier</li>
+                        <li>CGU</li>
+                        <li>Confidentialité</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
+                © 2026 Étudélice. Tous droits réservés.
+            </div>
+        </div>
+    </footer>
 
-// session
-function checkSession() {
-    fetch('controller/checkSession.php')
-        .then(res => res.json())
-        .then(data => {
-            if (data.logged_in) {
-                currentUserId = data.user_id;
-                document.getElementById('loginBtn').style.display = 'none';
-                document.getElementById('userProfile').style.display = 'flex';
-                document.getElementById('userFullName').textContent = data.user_prenom + ' ' + data.user_nom;
-                document.getElementById('userEmail').textContent = data.user_mail;
-            }
-        });
-}
+    <script>
+        let currentUserId = null;
+        let allReservations = [];
+        let currentFilter = 'all';
 
-// logout
-function logout(e) {
-    e.preventDefault();
-    fetch('controller/logout.php').then(() => location.reload());
-}
-
-// load
-async function chargerReservations() {
-    try {
-        const res = await fetch('controller/getCommandeController.php');
-        const result = await res.json();
-
-        if (result.success && result.data.length > 0) {
-            afficherReservations(result.data);
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('reservationsContainer').classList.remove('hidden');
-        } else {
-            afficherErreur("Aucune réservation trouvée");
+        // Vérifier la session
+        function checkSession() {
+            fetch('controller/checkSession.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.logged_in) {
+                        currentUserId = data.user_id;
+                        document.getElementById('userProfile').style.display = 'flex';
+                        document.getElementById('userFullName').textContent = data.user_prenom + ' ' + data.user_nom;
+                        document.getElementById('userEmail').textContent = data.user_mail;
+                        loadReservations();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => console.log('Session check error:', error));
         }
-    } catch {
-        afficherErreur("Erreur serveur");
-    }
-}
 
-// affichage
-function afficherReservations(data) {
-    const container = document.getElementById('reservationsContainer');
-    const count = document.getElementById('reservationsCount');
+        // Déconnexion
+        function logout(event) {
+            event.preventDefault();
+            fetch('controller/logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => console.log('Logout error:', error));
+        }
 
-    count.textContent = data.length;
-    container.innerHTML = '';
+        // Menu de profil
+        function initProfileMenu() {
+            const btn = document.getElementById('profileMenuBtn');
+            const menu = document.getElementById('profileMenu');
+            if (btn && menu) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    menu.classList.toggle('hidden');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
+            }
+        }
 
-    data.forEach(r => {
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-xl shadow-sm p-6';
+        // Charger les réservations
+        async function loadReservations() {
+            try {
+                const response = await fetch('controller/getReservationsController.php');
+                const result = await response.json();
 
-        card.innerHTML = `
-            <h3 class="text-lg font-bold mb-2">Réservation #${r.reservation_id}</h3>
-            <p>📅 ${r.reservation_date}</p>
-            <p>📌 ${r.reservation_statut}</p>
-            <p>👨‍🍳 user_id_1 : ${r.user_id_1}</p>
-        `;
+                if (result.success) {
+                    allReservations = result.data;
+                    
+                    document.getElementById('loadingState').classList.add('hidden');
+                    
+                    if (allReservations.length === 0) {
+                        document.getElementById('emptyState').classList.remove('hidden');
+                    } else {
+                        document.getElementById('contentState').classList.remove('hidden');
+                        renderReservations(allReservations);
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
 
-        container.appendChild(card);
-    });
-}
+        // Rendu des réservations
+        function renderReservations(reservations) {
+            const list = document.getElementById('reservationsList');
+            list.innerHTML = reservations.map(reservationCardHTML).join('');
+        }
 
-// erreur
-function afficherErreur(msg) {
-    document.getElementById('loadingState').classList.add('hidden');
-    document.getElementById('errorState').classList.remove('hidden');
-    document.getElementById('errorState').innerHTML = `<p class="text-red-600">${msg}</p>`;
-}
+        // HTML d'une carte de réservation
+        function reservationCardHTML(r) {
+            const reservDate = new Date(r.reservation_date);
+            const dateFormat = reservDate.toLocaleDateString('fr-FR', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
-// init
-document.addEventListener('DOMContentLoaded', () => {
-    checkSession();
-    chargerReservations();
-});
-</script>
+            const statusText = getStatusText(r.reservation_statut);
+            const statusClass = getStatusClass(r.reservation_statut);
 
+            const platsList = r.plats.map(p => `
+                <li class="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
+                    <span class="text-gray-700">
+                        <strong>${p.plat_libelle}</strong>
+                        ${p.plat_reservation_quantite > 1 ? `<span class="text-gray-500"> x${p.plat_reservation_quantite}</span>` : ''}
+                    </span>
+                    <span class="text-emerald-600 font-semibold">${(p.plat_prix * p.plat_reservation_quantite).toFixed(2).replace('.', ',')} €</span>
+                </li>
+            `).join('');
+
+            return `
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-1">
+                                    👨‍🍳 ${r.cuisinier_prenom} ${r.cuisinier_nom}
+                                </h3>
+                                <p class="text-sm text-gray-600">Cuisinier</p>
+                            </div>
+                            <span class="status-badge ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6 py-4 border-y border-gray-200">
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">Date de commande</p>
+                                <p class="font-semibold text-gray-900 text-sm">${dateFormat}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">Email cuisinier</p>
+                                <p class="font-semibold text-gray-900 text-sm truncate">${r.cuisinier_mail}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">Montant total</p>
+                                <p class="font-semibold text-emerald-600 text-lg">${r.prix_total.toFixed(2).replace('.', ',')} €</p>
+                            </div>
+                        </div>
+
+                        <!-- Plats de la réservation -->
+                        <div class="mb-4">
+                            <h4 class="text-sm font-semibold text-gray-900 mb-2">Plats commandés (${r.plats.length})</h4>
+                            <ul class="space-y-1">
+                                ${platsList}
+                            </ul>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="viewReservationDetails(${r.reservation_id})" class="flex-1 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors font-semibold text-sm">
+                                Voir détails
+                            </button>
+                            <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                                Contacter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Statut en texte
+        function getStatusText(status) {
+            switch(status) {
+                case 1: return 'En attente';
+                case 2: return 'Acceptée';
+                case 3: return 'Complétée';
+                default: return 'Inconnu';
+            }
+        }
+
+        // Classe CSS pour le statut
+        function getStatusClass(status) {
+            switch(status) {
+                case 1: return 'status-pending';
+                case 2: return 'status-accepted';
+                case 3: return 'status-completed';
+                default: return 'status-pending';
+            }
+        }
+
+        // Filtrer les réservations
+        function filterReservations(filter) {
+            currentFilter = filter;
+
+            // Mettre à jour les boutons de filtre
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const btnFilter = btn.getAttribute('data-filter');
+                if (btnFilter === String(filter)) {
+                    btn.classList.add('bg-emerald-600', 'text-white');
+                    btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                } else {
+                    btn.classList.remove('bg-emerald-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                }
+            });
+
+            // Filtrer et afficher
+            let filtered = allReservations;
+            if (filter !== 'all') {
+                filtered = allReservations.filter(r => r.reservation_statut === parseInt(filter));
+            }
+
+            renderReservations(filtered);
+        }
+
+        // Voir les détails
+        function viewReservationDetails(reservationId) {
+            alert('Détails de la commande #' + reservationId);
+            // TODO: Implémenter une modal pour voir les détails complets
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSession();
+            initProfileMenu();
+        });
+    </script>
 </body>
 </html>
