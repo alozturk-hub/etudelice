@@ -92,9 +92,19 @@ class TfReservationModel
      */
     public function getReservationById($reservationId)
     {
-        $sql = "SELECT res.*, st.status_libelle as reservation_status_text 
-                FROM ta_reservation res 
-                LEFT JOIN tf_status st ON res.reservation_statut = st.status_id 
+        $sql = "SELECT 
+                    res.*,
+                    cu.user_prenom as cuisinier_prenom,
+                    cu.user_nom as cuisinier_nom,
+                    cu.user_mail as cuisinier_mail,
+                    cl.user_prenom as client_prenom,
+                    cl.user_nom as client_nom,
+                    cl.user_mail as client_mail,
+                    st.status_libelle as reservation_status_text
+                FROM ta_reservation res
+                JOIN tf_user cu ON res.user_id_1 = cu.user_id
+                JOIN tf_user cl ON res.user_id = cl.user_id
+                LEFT JOIN tf_status st ON res.reservation_statut = st.status_id
                 WHERE reservation_id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $reservationId]);
@@ -142,6 +152,33 @@ class TfReservationModel
                 JOIN tf_user cl ON res.user_id = cl.user_id
                 LEFT JOIN tf_status st ON res.reservation_statut = st.status_id
                 WHERE res.user_id = :user_id OR res.user_id_1 = :user_id
+                ORDER BY res.reservation_date DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Récupérer les réservations d'un client (uniquement les commandes passées par l'utilisateur)
+     */
+    public function getClientReservations($userId)
+    {
+        $sql = "SELECT 
+                    res.*,
+                    cu.user_prenom as cuisinier_prenom,
+                    cu.user_nom as cuisinier_nom,
+                    cu.user_mail as cuisinier_mail,
+                    cl.user_prenom as client_prenom,
+                    cl.user_nom as client_nom,
+                    cl.user_mail as client_mail,
+                    st.status_libelle as reservation_status_text
+                FROM ta_reservation res
+                JOIN tf_user cu ON res.user_id_1 = cu.user_id
+                JOIN tf_user cl ON res.user_id = cl.user_id
+                LEFT JOIN tf_status st ON res.reservation_statut = st.status_id
+                WHERE res.user_id = :user_id
                 ORDER BY res.reservation_date DESC";
 
         $stmt = $this->pdo->prepare($sql);
