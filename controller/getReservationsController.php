@@ -17,7 +17,7 @@ try {
     $pdo = connexionPDO();
     $reservationModel = new TfReservationModel($pdo);
 
-    $reservations = $reservationModel->getUserReservations($_SESSION['user_id']);
+    $reservations = $reservationModel->getClientReservations($_SESSION['user_id']);
 
     // Ajouter les plats pour chaque réservation
     foreach ($reservations as &$reservation) {
