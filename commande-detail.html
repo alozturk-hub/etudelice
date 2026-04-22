@@ -127,7 +127,7 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <p class="text-emerald-100 text-sm mb-1">Réservation #<span id="reservationId"></span></p>
-                                <h1 class="text-3xl font-bold mb-2">Commande chez <span id="cuisinierName"></span></h1>
+                                <h1 class="text-3xl font-bold mb-2"><span id="reservationTitlePrefix">Commande chez</span> <span id="cuisinierName"></span></h1>
                                 <p class="text-emerald-100" id="reservationDate"></p>
                             </div>
                             <span id="statusBadge" class="px-4 py-2 bg-white/20 rounded-lg font-semibold text-sm"></span>
@@ -334,10 +334,12 @@
 
         function renderReservation(data) {
             document.getElementById('platsList').innerHTML = '';
+            const isAssignedCuisinier = parseInt(data.user_id_1, 10) === parseInt(currentUserId, 10);
 
             // En-tête
             document.getElementById('reservationId').textContent = data.reservation_id;
-            document.getElementById('cuisinierName').textContent = currentUserRole === 2
+            document.getElementById('reservationTitlePrefix').textContent = isAssignedCuisinier ? 'Commande de' : 'Commande chez';
+            document.getElementById('cuisinierName').textContent = isAssignedCuisinier
                 ? data.client_prenom + ' ' + data.client_nom
                 : data.cuisinier_prenom + ' ' + data.cuisinier_nom;
             
@@ -448,6 +450,9 @@
 
                 reservationData = result.data;
                 renderReservation(reservationData);
+                if (result.notification?.message) {
+                    alert(result.notification.message);
+                }
             } catch (error) {
                 console.error('Erreur de mise a jour du statut:', error);
                 alert('Une erreur est survenue lors de la mise a jour du statut.');

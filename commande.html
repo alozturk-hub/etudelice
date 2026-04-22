@@ -286,14 +286,16 @@
 
             const statusText = getStatusText(r.reservation_statut);
             const statusClass = getStatusClass(r.reservation_statut);
-            const isCuisinier = currentUserRole === 2;
-            const personLabel = isCuisinier
+            const isAssignedCuisinier = parseInt(r.user_id_1, 10) === parseInt(currentUserId, 10);
+            const personLabel = isAssignedCuisinier
                 ? `🧑‍🍽️ ${r.client_prenom} ${r.client_nom}`
                 : `👨‍🍳 ${r.cuisinier_prenom} ${r.cuisinier_nom}`;
-            const personRole = isCuisinier ? 'Client' : 'Cuisinier';
-            const personEmail = isCuisinier ? r.client_mail : r.cuisinier_mail;
+            const personRole = isAssignedCuisinier ? 'Client' : 'Cuisinier';
+            const personEmail = isAssignedCuisinier ? r.client_mail : r.cuisinier_mail;
             const nextStatusLabel = getNextStatusText(r.reservation_statut);
-            const canAdvanceStatus = isCuisinier && r.reservation_statut < 3;
+            const canAdvanceStatus = currentUserRole === 2
+                && isAssignedCuisinier
+                && parseInt(r.reservation_statut, 10) < 3;
 
             const platsList = r.plats.map(p => `
                 <li class="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
@@ -410,6 +412,9 @@
 
                 await loadReservations();
                 filterReservations(currentFilter);
+                if (result.notification?.message) {
+                    alert(result.notification.message);
+                }
             } catch (error) {
                 console.error('Erreur de mise a jour du statut:', error);
                 alert('Une erreur est survenue lors de la mise a jour du statut.');
