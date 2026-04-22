@@ -227,6 +227,26 @@ class TfReservationModel
             ':id' => $reservationId
         ]);
     }
+
+    /**
+     * Faire avancer une réservation au statut suivant si elle est assignée au cuisinier.
+     */
+    public function advanceReservationStatusForCuisinier($reservationId, $cuisinierId)
+    {
+        $sql = "UPDATE ta_reservation
+                SET reservation_statut = reservation_statut + 1
+                WHERE reservation_id = :reservation_id
+                  AND user_id_1 = :cuisinier_id
+                  AND reservation_statut IN (1, 2)";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':reservation_id' => $reservationId,
+            ':cuisinier_id' => $cuisinierId
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
 }
 
 ?>

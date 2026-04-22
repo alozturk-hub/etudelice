@@ -191,6 +191,7 @@
 
     <script>
         let currentUserId = null;
+        let currentUserRole = null;
         let allReservations = [];
         let currentFilter = 'all';
 
@@ -201,6 +202,7 @@
                 .then(data => {
                     if (data.logged_in) {
                         currentUserId = data.user_id;
+                        currentUserRole = parseInt(data.user_role, 10);
                         document.getElementById('userProfile').style.display = 'flex';
                         document.getElementById('userFullName').textContent = data.user_prenom + ' ' + data.user_nom;
                         document.getElementById('userEmail').textContent = data.user_mail;
@@ -284,6 +286,14 @@
 
             const statusText = getStatusText(r.reservation_statut);
             const statusClass = getStatusClass(r.reservation_statut);
+            const isCuisinier = currentUserRole === 2;
+            const personLabel = isCuisinier
+                ? `🧑‍🍽️ ${r.client_prenom} ${r.client_nom}`
+                : `👨‍🍳 ${r.cuisinier_prenom} ${r.cuisinier_nom}`;
+            const personRole = isCuisinier ? 'Client' : 'Cuisinier';
+            const personEmail = isCuisinier ? r.client_mail : r.cuisinier_mail;
+            const nextStatusLabel = getNextStatusText(r.reservation_statut);
+            const canAdvanceStatus = isCuisinier && r.reservation_statut < 3;
 
             const platsList = r.plats.map(p => `
                 <li class="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
@@ -301,9 +311,9 @@
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <h3 class="text-xl font-bold text-gray-900 mb-1">
-                                    👨‍🍳 ${r.cuisinier_prenom} ${r.cuisinier_nom}
+                                    ${personLabel}
                                 </h3>
-                                <p class="text-sm text-gray-600">Cuisinier</p>
+                                <p class="text-sm text-gray-600">${personRole}</p>
                             </div>
                             <span class="status-badge ${statusClass}">
                                 ${statusText}
@@ -316,8 +326,8 @@
                                 <p class="font-semibold text-gray-900 text-sm">${dateFormat}</p>
                             </div>
                             <div>
-                                <p class="text-xs text-gray-500 mb-1">Email cuisinier</p>
-                                <p class="font-semibold text-gray-900 text-sm truncate">${r.cuisinier_mail}</p>
+                                <p class="text-xs text-gray-500 mb-1">Email ${personRole.toLowerCase()}</p>
+                                <p class="font-semibold text-gray-900 text-sm truncate">${personEmail}</p>
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500 mb-1">Montant total</p>
@@ -337,9 +347,16 @@
                             <button onclick="viewReservationDetails(${r.reservation_id})" class="flex-1 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors font-semibold text-sm">
                                 Voir détails
                             </button>
-                            <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                            <a href="mailto:${personEmail}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
                                 Contacter
-                            </button>
+                            </a>
+                            ${canAdvanceStatus ? `
+                                <button
+                                    onclick="advanceReservationStatus(${r.reservation_id})"
+                                    class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-semibold">
+                                    Passer a ${nextStatusLabel}
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
@@ -348,7 +365,7 @@
 
         // Statut en texte
         function getStatusText(status) {
-            switch(status) {
+            switch(parseInt(status, 10)) {
                 case 1: return 'En attente';
                 case 2: return 'Acceptée';
                 case 3: return 'Complétée';
@@ -358,11 +375,44 @@
 
         // Classe CSS pour le statut
         function getStatusClass(status) {
-            switch(status) {
+            switch(parseInt(status, 10)) {
                 case 1: return 'status-pending';
                 case 2: return 'status-accepted';
                 case 3: return 'status-completed';
                 default: return 'status-pending';
+            }
+        }
+
+        function getNextStatusText(status) {
+            switch (parseInt(status, 10)) {
+                case 1: return 'Acceptée';
+                case 2: return 'Complétée';
+                default: return 'le statut suivant';
+            }
+        }
+
+        async function advanceReservationStatus(reservationId) {
+            try {
+                const response = await fetch('controller/updateReservationStatusController.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reservation_id: reservationId })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    alert(result.message || 'Impossible de mettre a jour le statut.');
+                    return;
+                }
+
+                await loadReservations();
+                filterReservations(currentFilter);
+            } catch (error) {
+                console.error('Erreur de mise a jour du statut:', error);
+                alert('Une erreur est survenue lors de la mise a jour du statut.');
             }
         }
 
