@@ -179,6 +179,7 @@
                                 <span class="font-semibold text-gray-900">Total</span>
                                 <span id="totalPrice" class="text-2xl font-bold text-emerald-600"></span>
                             </div>
+                            <div id="statusActionContainer" class="hidden mt-6 flex justify-end"></div>
                         </div>
                     </div>
                 </div>
@@ -332,9 +333,13 @@
         }
 
         function renderReservation(data) {
+            document.getElementById('platsList').innerHTML = '';
+
             // En-tête
             document.getElementById('reservationId').textContent = data.reservation_id;
-            document.getElementById('cuisinierName').textContent = data.cuisinier_prenom + ' ' + data.cuisinier_nom;
+            document.getElementById('cuisinierName').textContent = currentUserRole === 2
+                ? data.client_prenom + ' ' + data.client_nom
+                : data.cuisinier_prenom + ' ' + data.cuisinier_nom;
             
             const date = new Date(data.reservation_date);
             document.getElementById('reservationDate').textContent = 'Commande du ' + date.toLocaleDateString('fr-FR', {
@@ -347,14 +352,7 @@
 
             // Statut
             const statusBadge = document.getElementById('statusBadge');
-            const statuses = {
-                'en_attente': 'En attente',
-                'confirmee': 'Confirmée',
-                'en_cours': 'En cours',
-                'terminee': 'Terminée',
-                'annulee': 'Annulée'
-            };
-            statusBadge.textContent = statuses[data.reservation_statut] || data.reservation_statut;
+            statusBadge.textContent = getStatusText(data.reservation_statut);
 
             // Cuisinier
             document.getElementById('cuisinierFullName').textContent = data.cuisinier_prenom + ' ' + data.cuisinier_nom;
@@ -377,14 +375,83 @@
                     </div>
                     <div class="text-right">
                         <p class="font-semibold text-gray-900">${parseFloat(plat.plat_prix).toFixed(2).replace('.', ',')} €</p>
-                        <p class="text-sm text-gray-600">Quantité: ${plat.quantite || 1}</p>
+                        <p class="text-sm text-gray-600">Quantité: ${plat.plat_reservation_quantite || 1}</p>
                     </div>
                 `;
                 platsList.appendChild(platDiv);
-                totalPrice += parseFloat(plat.plat_prix) * (plat.quantite || 1);
+                totalPrice += parseFloat(plat.plat_prix) * (plat.plat_reservation_quantite || 1);
             });
 
             document.getElementById('totalPrice').textContent = totalPrice.toFixed(2).replace('.', ',') + ' €';
+            renderStatusAction(data);
+        }
+
+        function getStatusText(status) {
+            switch (parseInt(status, 10)) {
+                case 1: return 'En attente';
+                case 2: return 'Acceptée';
+                case 3: return 'Complétée';
+                default: return 'Inconnu';
+            }
+        }
+
+        function getNextStatusText(status) {
+            switch (parseInt(status, 10)) {
+                case 1: return 'Acceptée';
+                case 2: return 'Complétée';
+                default: return 'le statut suivant';
+            }
+        }
+
+        function renderStatusAction(data) {
+            const container = document.getElementById('statusActionContainer');
+            const canAdvanceStatus = currentUserRole === 2
+                && currentUserId === parseInt(data.user_id_1, 10)
+                && parseInt(data.reservation_statut, 10) < 3;
+
+            if (!canAdvanceStatus) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <button
+                    onclick="advanceReservationStatus()"
+                    class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                    Passer a ${getNextStatusText(data.reservation_statut)}
+                </button>
+            `;
+        }
+
+        async function advanceReservationStatus() {
+            if (!reservationData) {
+                return;
+            }
+
+            try {
+                const response = await fetch('controller/updateReservationStatusController.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reservation_id: reservationData.reservation_id })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    alert(result.message || 'Impossible de mettre a jour le statut.');
+                    return;
+                }
+
+                reservationData = result.data;
+                renderReservation(reservationData);
+            } catch (error) {
+                console.error('Erreur de mise a jour du statut:', error);
+                alert('Une erreur est survenue lors de la mise a jour du statut.');
+            }
         }
 
         // Initialisation

@@ -25,12 +25,23 @@ try {
     $pdo = connexionPDO();
     $reservationModel = new TfReservationModel($pdo);
 
-    // Vérifier que la réservation appartient à l'utilisateur connecté
     $reservation = $reservationModel->getReservationById($reservationId);
-    
-    if (!$reservation || $reservation['user_id'] != $_SESSION['user_id']) {
+
+    if (!$reservation) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Réservation non trouvée.']);
+        exit;
+    }
+
+    $userId = (int) $_SESSION['user_id'];
+    $userRole = (int) ($_SESSION['user_role'] ?? 0);
+
+    $isClientOwner = (int) $reservation['user_id'] === $userId;
+    $isAssignedCuisinier = $userRole === 2 && (int) $reservation['user_id_1'] === $userId;
+
+    if (!$isClientOwner && !$isAssignedCuisinier) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Accès refusé à cette réservation.']);
         exit;
     }
 
