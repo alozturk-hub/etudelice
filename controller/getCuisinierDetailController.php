@@ -2,12 +2,14 @@
 session_start();
 require_once '../modele/etudeliceDataBase.php';
 require_once '../modele/tfUserModel.php';
+require_once '../modele/tfAvisModel.php';
 
 header('Content-Type: application/json');
 
 try {
     $pdo = connexionPDO();
     $userModel = new TfUserModel($pdo);
+    $avisModel = new TfAvisModel($pdo);
 
     if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
         echo json_encode([
@@ -30,6 +32,8 @@ try {
 
     // Ne pas retourner le mot de passe
     unset($cuisinier['user_password']);
+    $cuisinier['avis_stats'] = $avisModel->getCuisinierRatingSummary($cuisinierId);
+    $cuisinier['avis_recents'] = $avisModel->getRecentReviewsForCuisinier($cuisinierId, 5);
 
     echo json_encode([
         'success' => true,

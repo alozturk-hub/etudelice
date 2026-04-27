@@ -303,7 +303,7 @@
                         <strong>${p.plat_libelle}</strong>
                         ${p.plat_reservation_quantite > 1 ? `<span class="text-gray-500"> x${p.plat_reservation_quantite}</span>` : ''}
                     </span>
-                    <span class="text-emerald-600 font-semibold">${(p.plat_prix * p.plat_reservation_quantite).toFixed(2).replace('.', ',')} €</span>
+                    <span class="text-emerald-600 font-semibold">${(parseFloat(p.plat_prix) * p.plat_reservation_quantite).toFixed(2).replace('.', ',')} €</span>
                 </li>
             `).join('');
 

@@ -51,22 +51,30 @@ class TfReservationModel
             foreach ($plats as $plat) {
                 $platId = $plat['id'];
                 $quantite = isset($plat['quantite']) ? $plat['quantite'] : 1;
+                $prixUnitaire = isset($plat['prix_unitaire']) ? (float) $plat['prix_unitaire'] : null;
+                $prixOriginal = isset($plat['prix_original']) ? (float) $plat['prix_original'] : $prixUnitaire;
 
                 $sqlPlat = "INSERT INTO ta_plat_reservation (
                                 plat_id,
                                 reservation_id,
-                                plat_reservation_quantite
+                                plat_reservation_quantite,
+                                plat_reservation_prix_unitaire,
+                                plat_reservation_prix_original
                             ) VALUES (
                                 :plat_id,
                                 :reservation_id,
-                                :quantite
+                                :quantite,
+                                :prix_unitaire,
+                                :prix_original
                             )";
 
                 $stmtPlat = $this->pdo->prepare($sqlPlat);
                 $resultPlat = $stmtPlat->execute([
                     ':plat_id' => $platId,
                     ':reservation_id' => $reservationId,
-                    ':quantite' => $quantite
+                    ':quantite' => $quantite,
+                    ':prix_unitaire' => $prixUnitaire,
+                    ':prix_original' => $prixOriginal
                 ]);
 
                 if (!$resultPlat) {
@@ -121,10 +129,12 @@ class TfReservationModel
                     tp.plat_id,
                     tp.plat_libelle,
                     tp.plat_description,
-                    tp.plat_prix,
-                    tpr.plat_reservation_quantite
+                    COALESCE(tpr.plat_reservation_prix_unitaire, tp.plat_prix) AS plat_prix,
+                    COALESCE(tpr.plat_reservation_prix_original, tp.plat_prix) AS plat_prix_original,
+                    tpr.plat_reservation_quantite,
+                    tpr.plat_reservation_prix_unitaire
                 FROM ta_plat_reservation tpr
-                JOIN tf_plat tp ON tpr.plat_id = tp.plat_id
+                JOIN tf_cuisinier_plat tp ON tpr.plat_id = tp.plat_id
                 WHERE tpr.reservation_id = :reservation_id";
 
         $stmt = $this->pdo->prepare($sql);
@@ -246,6 +256,26 @@ class TfReservationModel
         ]);
 
         return $stmt->rowCount() > 0;
+    }
+
+    public function getReservationStatsForUser($userId)
+    {
+        $sql = "SELECT
+                    COUNT(*) AS total,
+                    SUM(CASE WHEN reservation_statut IN (1, 2) THEN 1 ELSE 0 END) AS en_cours,
+                    SUM(CASE WHEN reservation_statut = 3 THEN 1 ELSE 0 END) AS terminees
+                FROM ta_reservation
+                WHERE user_id = :user_id OR user_id_1 = :user_id";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'total' => (int) ($stats['total'] ?? 0),
+            'en_cours' => (int) ($stats['en_cours'] ?? 0),
+            'terminees' => (int) ($stats['terminees'] ?? 0),
+        ];
     }
 }
 
