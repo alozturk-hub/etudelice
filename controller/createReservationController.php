@@ -6,6 +6,7 @@ error_log('[RESERVATION] Début du traitement de la création de réservation');
 
 require_once '../modele/etudeliceDataBase.php';
 require_once '../modele/tfReservationModel.php';
+require_once '../modele/tfCuisinierPlatModel.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -25,6 +26,15 @@ if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'success' => false,
         'message' => 'Vous devez être connecté pour créer une réservation'
+    ]);
+    exit;
+}
+
+if ((int) ($_SESSION['user_role'] ?? 0) === 2) {
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Les cuisiniers peuvent consulter les plats, mais ne peuvent pas passer de commande.'
     ]);
     exit;
 }
@@ -67,6 +77,7 @@ try {
     error_log('[RESERVATION] Connexion à la base de données établie');
 
     $model = new TfReservationModel($pdo);
+    $platModel = new TfCuisinierPlatModel($pdo);
 
     // Préparer les plats
     $plats = [];
@@ -74,9 +85,17 @@ try {
         if (empty($plat['id'])) {
             throw new Exception('ID de plat invalide');
         }
+        $platDetail = $platModel->buildReservationPricing((int) $plat['id'], $userId);
+
+        if ((int) $platDetail['user_id'] !== $cuisinierId) {
+            throw new Exception('Un plat sélectionné ne correspond pas à ce cuisinier.');
+        }
+
         $plats[] = [
             'id' => intval($plat['id']),
-            'quantite' => isset($plat['quantite']) ? intval($plat['quantite']) : 1
+            'quantite' => isset($plat['quantite']) ? intval($plat['quantite']) : 1,
+            'prix_unitaire' => $platDetail['plat_prix_reduit'],
+            'prix_original' => $platDetail['plat_prix_original']
         ];
     }
 

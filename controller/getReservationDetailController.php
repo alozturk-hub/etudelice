@@ -4,6 +4,7 @@ session_start();
 
 require_once '../modele/etudeliceDataBase.php';
 require_once '../modele/tfReservationModel.php';
+require_once '../modele/tfAvisModel.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -24,6 +25,7 @@ $reservationId = (int) $_GET['id'];
 try {
     $pdo = connexionPDO();
     $reservationModel = new TfReservationModel($pdo);
+    $avisModel = new TfAvisModel($pdo);
 
     $reservation = $reservationModel->getReservationById($reservationId);
 
@@ -48,6 +50,15 @@ try {
     // Ajouter les plats pour la réservation
     $plats = $reservationModel->getReservationPlats($reservationId);
     $reservation['plats'] = $plats;
+
+    if ($isClientOwner) {
+        $eligibility = $avisModel->canClientReviewCuisinier($userId, (int) $reservation['user_id_1']);
+        $reservation['avis_client'] = $avisModel->getReviewByClientAndCuisinier($userId, (int) $reservation['user_id_1']);
+        $reservation['avis_autorise'] = $eligibility['allowed'];
+        $reservation['avis_reservation_id'] = $eligibility['reservation_id'];
+    }
+
+    $reservation['avis_stats'] = $avisModel->getCuisinierRatingSummary((int) $reservation['user_id_1']);
 
     echo json_encode([
         'success' => true,

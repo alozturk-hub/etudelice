@@ -171,6 +171,111 @@
                                 </div>
                             </div>
 
+                            <div id="avisSection" class="hidden">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.166 3.59a1 1 0 00.95.69h3.775c.969 0 1.371 1.24.588 1.81l-3.054 2.219a1 1 0 00-.364 1.118l1.166 3.59c.3.921-.755 1.688-1.539 1.118l-3.054-2.219a1 1 0 00-1.176 0l-3.054 2.219c-.783.57-1.838-.197-1.539-1.118l1.166-3.59a1 1 0 00-.364-1.118L2.98 9.017c-.783-.57-.38-1.81.588-1.81h3.775a1 1 0 00.95-.69l1.166-3.59z">
+                                        </path>
+                                    </svg>
+                                    Ma note moyenne
+                                </h3>
+                                <div id="avisSummaryCard" class="bg-gray-50 rounded-lg p-4 mb-4"></div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-900 mb-3">Derniers avis reçus</h4>
+                                    <div id="avisRecentsList" class="space-y-3"></div>
+                                </div>
+                            </div>
+
+                            <div id="cuisinierPlatsSection" class="hidden">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                                        </path>
+                                    </svg>
+                                    Mes plats proposés
+                                </h3>
+
+                                <div id="cuisinierPlatsList" class="space-y-4 mb-6"></div>
+
+                                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                                    <h4 class="text-lg font-bold text-gray-900 mb-4">Ajouter un plat</h4>
+                                    <form id="platForm" class="space-y-4">
+                                        <div class="grid md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nom du plat *</label>
+                                                <input type="text" id="platLibelle" required
+                                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-semibold text-gray-700 mb-2">Prix (€) *</label>
+                                                <input type="number" id="platPrix" min="0.01" step="0.01" required
+                                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
+                                            <textarea id="platDescription" rows="3" required
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Photo du plat</label>
+                                            <input type="file" id="platImage" accept="image/*"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-2">Ingrédients *</label>
+                                            <textarea id="platIngredients" rows="3" required
+                                                placeholder="Exemple : tomate, mozzarella, basilic"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                                            <p class="text-xs text-gray-500 mt-2">Séparez les ingrédients par une virgule ou un retour à la ligne.</p>
+                                        </div>
+                                        <div id="platMessage" class="hidden p-4 rounded-lg text-sm"></div>
+                                        <div class="flex justify-end">
+                                            <button type="submit"
+                                                class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                                                Ajouter ce plat
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div id="frigoSection" class="hidden">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 8h14M5 12h14M5 16h14M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z">
+                                        </path>
+                                    </svg>
+                                    Mon frigo
+                                </h3>
+
+                                <div id="frigoList" class="space-y-3 mb-6"></div>
+
+                                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-4">
+                                    <h4 class="text-lg font-bold text-gray-900">Ajouter un ingrédient</h4>
+                                    <div class="grid md:grid-cols-[2fr_1fr_auto] gap-3">
+                                        <input type="text" id="frigoIngredientName" placeholder="Exemple : oignon"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        <input type="text" id="frigoIngredientQuantity" placeholder="Quantité"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        <button type="button" onclick="addFrigoIngredient()"
+                                            class="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                                            Ajouter
+                                        </button>
+                                    </div>
+                                    <div id="frigoMessage" class="hidden p-4 rounded-lg text-sm"></div>
+                                    <div class="flex justify-end">
+                                        <button type="button" onclick="saveFrigo()"
+                                            class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                                            Enregistrer mon frigo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Statistiques -->
                             <div>
                                 <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -219,6 +324,17 @@
                             </path>
                         </svg>
                         Modifier mon profil
+                    </button>
+                </div>
+
+                <div class="mt-8 bg-red-50 border border-red-200 rounded-xl p-6">
+                    <h3 class="text-xl font-bold text-red-700 mb-2">Zone de danger</h3>
+                    <p class="text-red-700 mb-4">
+                        Supprimer votre compte effacera aussi vos réservations, votre frigo et, si vous êtes cuisinier, vos plats publiés.
+                    </p>
+                    <button type="button" onclick="openDeleteAccountModal()"
+                        class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                        Supprimer mon compte
                     </button>
                 </div>
             </div>
@@ -282,6 +398,32 @@
         </div>
     </div>
 
+    <div id="deleteAccountModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-xl w-full p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Supprimer mon compte</h3>
+            <p class="text-gray-700 mb-4">
+                Cette action est définitive. Pour confirmer, écrivez exactement :
+            </p>
+            <p class="font-semibold text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">
+                je supprime mon compte etudelice
+            </p>
+            <input type="text" id="deleteAccountPhrase"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4"
+                placeholder="Tapez la phrase de confirmation">
+            <div id="deleteAccountMessage" class="hidden p-4 rounded-lg text-sm mb-4"></div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeDeleteAccountModal()"
+                    class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
+                    Annuler
+                </button>
+                <button type="button" onclick="deleteAccount()"
+                    class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                    Supprimer définitivement
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-gray-900 text-white mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -322,20 +464,19 @@
     </footer>
 
     <script>
-        // Variables globales
         let currentUserId = null;
         let currentUserRole = null;
         let currentUserData = {};
         let profileData = null;
+        let frigoIngredients = [];
 
-        // Vérifier la session
         function checkSession() {
             fetch('controller/checkSession.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.logged_in) {
                         currentUserId = data.user_id;
-                        currentUserRole = data.user_role;
+                        currentUserRole = parseInt(data.user_role, 10);
                         currentUserData = data;
                         document.getElementById('userProfile').style.display = 'flex';
                         document.getElementById('userFullName').textContent = data.user_prenom + ' ' + data.user_nom;
@@ -348,7 +489,6 @@
                 .catch(error => console.log('Session check error:', error));
         }
 
-        // Déconnexion
         function logout(event) {
             event.preventDefault();
             fetch('controller/logout.php')
@@ -361,7 +501,6 @@
                 .catch(error => console.log('Logout error:', error));
         }
 
-        // Menu profil
         function initProfileMenu() {
             const btn = document.getElementById('profileMenuBtn');
             const menu = document.getElementById('profileMenu');
@@ -378,7 +517,6 @@
             }
         }
 
-        // Charger le profil
         async function loadProfile() {
             try {
                 const response = await fetch('controller/getProfileController.php');
@@ -386,6 +524,7 @@
 
                 if (result.success) {
                     profileData = result.data;
+                    frigoIngredients = Array.isArray(profileData.frigo) ? [...profileData.frigo] : [];
                     renderProfile(profileData);
                     document.getElementById('loadingState').classList.add('hidden');
                     document.getElementById('contentState').classList.remove('hidden');
@@ -396,34 +535,240 @@
         }
 
         function renderProfile(data) {
-            // Informations de base
+            const roleId = parseInt(data.role_id, 10);
+
             document.getElementById('profileFullName').textContent = data.user_prenom + ' ' + data.user_nom;
             document.getElementById('profileNom').textContent = data.user_nom;
             document.getElementById('profilePrenom').textContent = data.user_prenom;
             document.getElementById('profileEmail').textContent = data.user_mail;
             document.getElementById('profileTelephone').textContent = data.user_telephone || 'Non renseigné';
 
-            // Badge de rôle
             const roleBadge = document.getElementById('profileRoleBadge');
-            if (data.user_role === 2) {
-                roleBadge.textContent = '👨‍🍳 Cuisinier';
+            if (roleId === 2) {
+                roleBadge.textContent = 'Cuisinier';
                 roleBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-800';
                 document.getElementById('specialiteSection').classList.remove('hidden');
+                document.getElementById('avisSection').classList.remove('hidden');
+                document.getElementById('cuisinierPlatsSection').classList.remove('hidden');
                 document.getElementById('profileSpecialite').textContent = data.user_specialite || 'Non renseignée';
+                renderAvisSection(data.avis_stats || { note_moyenne: 0, note_count: 0 }, data.avis_recents || []);
+                renderCuisinierPlats(data.mes_plats || []);
             } else {
-                roleBadge.textContent = '👤 Client';
+                roleBadge.textContent = 'Client';
                 roleBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800';
+                document.getElementById('frigoSection').classList.remove('hidden');
+                renderFrigo();
             }
 
-            // Statistiques
             document.getElementById('statsReservations').textContent = data.stats?.total || 0;
             document.getElementById('statsEnCours').textContent = data.stats?.en_cours || 0;
             document.getElementById('statsTerminees').textContent = data.stats?.terminees || 0;
         }
 
-        // Modal de modification
+        function renderStars(note) {
+            const rounded = Math.round(parseFloat(note) || 0);
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= rounded ? '★' : '☆';
+            }
+            return stars;
+        }
+
+        function renderAvisSection(stats, reviews) {
+            const summaryCard = document.getElementById('avisSummaryCard');
+            const list = document.getElementById('avisRecentsList');
+
+            if (!stats.note_count) {
+                summaryCard.innerHTML = '<p class="text-gray-600">Vous n’avez pas encore reçu d’avis.</p>';
+                list.innerHTML = '<p class="text-gray-600 bg-gray-50 rounded-lg p-4">Aucun avis récent pour le moment.</p>';
+                return;
+            }
+
+            summaryCard.innerHTML = `
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="text-3xl font-bold text-gray-900">${stats.note_moyenne.toFixed(1).replace('.', ',')} / 5</span>
+                    <span class="text-amber-500 text-2xl">${renderStars(stats.note_moyenne)}</span>
+                    <span class="text-gray-500">(${stats.note_count} avis)</span>
+                </div>
+            `;
+
+            if (!reviews.length) {
+                list.innerHTML = '<p class="text-gray-600 bg-gray-50 rounded-lg p-4">Aucun avis récent pour le moment.</p>';
+                return;
+            }
+
+            list.innerHTML = reviews.map(review => `
+                <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <div class="flex items-start justify-between gap-4 mb-2">
+                        <div>
+                            <p class="font-semibold text-gray-900">${review.client_prenom} ${review.client_nom}</p>
+                            <p class="text-sm text-gray-500">${new Date(review.created_at).toLocaleDateString('fr-FR')}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-gray-900">${review.avis_note}/5</p>
+                            <p class="text-amber-500">${renderStars(review.avis_note)}</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">${review.avis_commentaire || 'Aucun commentaire laissé.'}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderCuisinierPlats(plats) {
+            const list = document.getElementById('cuisinierPlatsList');
+
+            if (!plats.length) {
+                list.innerHTML = '<p class="text-gray-600 bg-gray-50 rounded-lg p-4">Vous n\'avez pas encore ajouté de plat.</p>';
+                return;
+            }
+
+            list.innerHTML = plats.map(plat => {
+                const ingredients = (plat.ingredients || []).map(i => i.ingredient_libelle).join(', ');
+                const image = plat.plat_image
+                    ? `<img src="${plat.plat_image}" alt="${plat.plat_libelle}" class="w-24 h-24 rounded-lg object-cover">`
+                    : `<div class="w-24 h-24 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold">Photo</div>`;
+
+                return `
+                    <div class="flex gap-4 items-start bg-white border border-gray-200 rounded-xl p-4">
+                        ${image}
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-lg font-bold text-gray-900">${plat.plat_libelle}</p>
+                                    <p class="text-gray-600 mt-1">${plat.plat_description}</p>
+                                </div>
+                                <p class="text-lg font-bold text-emerald-600">${parseFloat(plat.plat_prix).toFixed(2).replace('.', ',')} €</p>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3"><strong>Ingrédients :</strong> ${ingredients || 'Aucun renseigné'}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFrigo() {
+            const list = document.getElementById('frigoList');
+
+            if (!frigoIngredients.length) {
+                list.innerHTML = '<p class="text-gray-600 bg-gray-50 rounded-lg p-4">Votre frigo est vide pour le moment.</p>';
+                return;
+            }
+
+            list.innerHTML = frigoIngredients.map((ingredient, index) => `
+                <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4">
+                    <div>
+                        <p class="font-semibold text-gray-900">${ingredient.ingredient_libelle || ingredient.libelle}</p>
+                        <p class="text-sm text-gray-500">${ingredient.user_ingredient_quantite || ingredient.quantite || 'Quantité non précisée'}</p>
+                    </div>
+                    <button type="button" onclick="removeFrigoIngredient(${index})"
+                        class="px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        Retirer
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addFrigoIngredient() {
+            const nameInput = document.getElementById('frigoIngredientName');
+            const quantityInput = document.getElementById('frigoIngredientQuantity');
+            const libelle = nameInput.value.trim();
+            const quantite = quantityInput.value.trim();
+
+            if (!libelle) {
+                showMessage('frigoMessage', 'Le nom de l\'ingrédient est obligatoire.', false);
+                return;
+            }
+
+            const existing = frigoIngredients.findIndex(ingredient =>
+                (ingredient.ingredient_libelle || ingredient.libelle).toLowerCase() === libelle.toLowerCase()
+            );
+
+            const payload = { libelle, quantite };
+
+            if (existing >= 0) {
+                frigoIngredients[existing] = payload;
+            } else {
+                frigoIngredients.push(payload);
+            }
+
+            nameInput.value = '';
+            quantityInput.value = '';
+            showMessage('frigoMessage', 'Ingrédient ajouté à la liste locale. Pensez à enregistrer.', true);
+            renderFrigo();
+        }
+
+        function removeFrigoIngredient(index) {
+            frigoIngredients.splice(index, 1);
+            renderFrigo();
+        }
+
+        async function saveFrigo() {
+            try {
+                const response = await fetch('controller/saveFrigoController.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ingredients: frigoIngredients })
+                });
+                const result = await response.json();
+                showMessage('frigoMessage', result.message, result.success);
+
+                if (result.success) {
+                    await loadProfile();
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage('frigoMessage', 'Une erreur est survenue lors de l\'enregistrement du frigo.', false);
+            }
+        }
+
+        document.getElementById('platForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            try {
+                const imageFile = document.getElementById('platImage').files[0];
+                const payload = {
+                    libelle: document.getElementById('platLibelle').value.trim(),
+                    description: document.getElementById('platDescription').value.trim(),
+                    prix: document.getElementById('platPrix').value,
+                    ingredients: document.getElementById('platIngredients').value
+                };
+
+                if (imageFile) {
+                    payload.imageData = await readFileAsDataUrl(imageFile);
+                }
+
+                const response = await fetch('controller/createCuisinierPlatController.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const rawText = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(rawText);
+                } catch (parseError) {
+                    throw new Error(rawText || 'Réponse serveur invalide.');
+                }
+
+                showMessage('platMessage', result.message, result.success);
+
+                if (result.success) {
+                    document.getElementById('platForm').reset();
+                    await loadProfile();
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage('platMessage', 'Une erreur est survenue lors de l\'ajout du plat.', false);
+            }
+        });
+
         function openEditModal() {
-            if (!profileData) return;
+            if (!profileData) {
+                return;
+            }
+
+            const roleId = parseInt(profileData.role_id, 10);
 
             document.getElementById('editNom').value = profileData.user_nom;
             document.getElementById('editPrenom').value = profileData.user_prenom;
@@ -431,9 +776,12 @@
             document.getElementById('editTelephone').value = profileData.user_telephone || '';
             document.getElementById('editPassword').value = '';
 
-            if (profileData.user_role === 2) {
+            if (roleId === 2) {
                 document.getElementById('editSpecialiteDiv').classList.remove('hidden');
                 document.getElementById('editSpecialite').value = profileData.user_specialite || '';
+            } else {
+                document.getElementById('editSpecialiteDiv').classList.add('hidden');
+                document.getElementById('editSpecialite').value = '';
             }
 
             document.getElementById('editModal').classList.add('active');
@@ -444,10 +792,20 @@
             document.getElementById('editModal').classList.remove('active');
         }
 
-        // Soumettre la modification
+        function openDeleteAccountModal() {
+            document.getElementById('deleteAccountPhrase').value = '';
+            document.getElementById('deleteAccountMessage').classList.add('hidden');
+            document.getElementById('deleteAccountModal').classList.add('active');
+        }
+
+        function closeDeleteAccountModal() {
+            document.getElementById('deleteAccountModal').classList.remove('active');
+        }
+
         document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
+            const roleId = parseInt(profileData.role_id, 10);
             const formData = {
                 nom: document.getElementById('editNom').value,
                 prenom: document.getElementById('editPrenom').value,
@@ -460,7 +818,7 @@
                 formData.password = passwordValue;
             }
 
-            if (profileData.user_role === 2) {
+            if (roleId === 2) {
                 formData.specialite = document.getElementById('editSpecialite').value;
             }
 
@@ -497,14 +855,60 @@
             }
         });
 
-        // Fermer modal en cliquant à l'extérieur
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showMessage(id, message, success) {
+            const element = document.getElementById(id);
+            element.textContent = message;
+            element.className = success
+                ? 'p-4 rounded-lg text-sm bg-green-50 border border-green-200 text-green-700'
+                : 'p-4 rounded-lg text-sm bg-red-50 border border-red-200 text-red-700';
+            element.classList.remove('hidden');
+        }
+
+        async function deleteAccount() {
+            const phrase = document.getElementById('deleteAccountPhrase').value.trim();
+
+            try {
+                const response = await fetch('controller/deleteAccountController.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phrase })
+                });
+
+                const result = await response.json();
+                showMessage('deleteAccountMessage', result.message, result.success);
+
+                if (result.success) {
+                    setTimeout(() => {
+                        window.location.href = result.redirect || 'index.html';
+                    }, 1200);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage('deleteAccountMessage', 'Une erreur est survenue lors de la suppression du compte.', false);
+            }
+        }
+
         document.getElementById('editModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeEditModal();
             }
         });
 
-        // Initialisation
+        document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteAccountModal();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             checkSession();
             initProfileMenu();

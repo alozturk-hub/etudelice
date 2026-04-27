@@ -28,7 +28,7 @@ try {
         // Calculer le prix total de la réservation
         $total = 0;
         foreach ($plats as $plat) {
-            $total += $plat['plat_prix'] * $plat['plat_reservation_quantite'];
+            $total += ((float) $plat['plat_prix']) * ((int) $plat['plat_reservation_quantite']);
         }
         $reservation['prix_total'] = $total;
     }

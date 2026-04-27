@@ -184,6 +184,39 @@
                     </div>
                 </div>
 
+                <div id="reviewSection" class="hidden bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+                    <div class="p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4">Votre avis sur ce cuisinier</h2>
+                        <p class="text-gray-600 mb-4">Partagez votre expérience après une commande complétée.</p>
+                        <div id="reviewSummary" class="mb-4 text-sm text-gray-600"></div>
+                        <div class="mb-4">
+                            <label for="reviewNote" class="block text-sm font-semibold text-gray-700 mb-2">Note *</label>
+                            <select id="reviewNote"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                <option value="">Choisir une note</option>
+                                <option value="5">5 / 5</option>
+                                <option value="4">4 / 5</option>
+                                <option value="3">3 / 5</option>
+                                <option value="2">2 / 5</option>
+                                <option value="1">1 / 5</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="reviewComment" class="block text-sm font-semibold text-gray-700 mb-2">Commentaire</label>
+                            <textarea id="reviewComment" rows="4" maxlength="1000"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                placeholder="Dites ce que vous avez pensé du repas, de la communication ou de la préparation."></textarea>
+                        </div>
+                        <div id="reviewMessage" class="hidden p-4 rounded-lg text-sm mb-4"></div>
+                        <div class="flex justify-end">
+                            <button id="saveReviewBtn" type="button" onclick="saveReview()"
+                                class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold">
+                                Enregistrer mon avis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Actions -->
                 <div class="flex gap-4 justify-end">
                     <a href="commande.html"
@@ -252,7 +285,7 @@
 
         // Vérifier la session
         function checkSession() {
-            fetch('controller/checkSession.php')
+            return fetch('controller/checkSession.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.logged_in) {
@@ -370,6 +403,7 @@
             data.plats.forEach(plat => {
                 const platDiv = document.createElement('div');
                 platDiv.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg';
+                const hasReduction = parseFloat(plat.plat_prix_original || plat.plat_prix) > parseFloat(plat.plat_prix);
                 platDiv.innerHTML = `
                     <div class="flex-1">
                         <p class="font-semibold text-gray-900">${plat.plat_libelle}</p>
@@ -377,6 +411,7 @@
                     </div>
                     <div class="text-right">
                         <p class="font-semibold text-gray-900">${parseFloat(plat.plat_prix).toFixed(2).replace('.', ',')} €</p>
+                        ${hasReduction ? `<p class="text-xs text-gray-500 line-through">${parseFloat(plat.plat_prix_original).toFixed(2).replace('.', ',')} €</p>` : ''}
                         <p class="text-sm text-gray-600">Quantité: ${plat.plat_reservation_quantite || 1}</p>
                     </div>
                 `;
@@ -386,6 +421,7 @@
 
             document.getElementById('totalPrice').textContent = totalPrice.toFixed(2).replace('.', ',') + ' €';
             renderStatusAction(data);
+            renderReviewSection(data);
         }
 
         function getStatusText(status) {
@@ -459,11 +495,116 @@
             }
         }
 
+        function renderStars(note) {
+            const rounded = Math.round(parseFloat(note) || 0);
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= rounded ? '★' : '☆';
+            }
+            return stars;
+        }
+
+        function renderReviewSection(data) {
+            const section = document.getElementById('reviewSection');
+            const summary = document.getElementById('reviewSummary');
+            const noteInput = document.getElementById('reviewNote');
+            const commentInput = document.getElementById('reviewComment');
+            const button = document.getElementById('saveReviewBtn');
+            const isClientOwner = parseInt(data.user_id, 10) === parseInt(currentUserId, 10);
+            const isCompleted = parseInt(data.reservation_statut, 10) === 3;
+            const canReview = isClientOwner && data.avis_autorise;
+            const existingReview = data.avis_client || null;
+            const stats = data.avis_stats || { note_moyenne: 0, note_count: 0 };
+
+            if (!isClientOwner) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            summary.innerHTML = stats.note_count > 0
+                ? `Note moyenne actuelle : <span class="font-semibold text-gray-900">${stats.note_moyenne.toFixed(1).replace('.', ',')} / 5</span> <span class="text-amber-500">${renderStars(stats.note_moyenne)}</span> sur ${stats.note_count} avis`
+                : 'Ce cuisinier n’a pas encore reçu d’avis.';
+
+            if (existingReview) {
+                noteInput.value = existingReview.avis_note;
+                commentInput.value = existingReview.avis_commentaire || '';
+                button.textContent = 'Mettre à jour mon avis';
+            } else {
+                noteInput.value = '';
+                commentInput.value = '';
+                button.textContent = 'Enregistrer mon avis';
+            }
+
+            const inputsDisabled = !canReview;
+            noteInput.disabled = inputsDisabled;
+            commentInput.disabled = inputsDisabled;
+            button.disabled = inputsDisabled;
+            button.className = inputsDisabled
+                ? 'px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-semibold'
+                : 'px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold';
+
+            if (!canReview && !existingReview && !isCompleted) {
+                showMessage('reviewMessage', 'Vous pourrez laisser un avis dès qu’une de vos commandes avec ce cuisinier sera complétée.', false);
+            } else if (!canReview && !existingReview) {
+                showMessage('reviewMessage', 'Vous devez avoir une commande complétée chez ce cuisinier pour laisser un avis.', false);
+            } else {
+                document.getElementById('reviewMessage').classList.add('hidden');
+            }
+        }
+
+        async function saveReview() {
+            if (!reservationData) {
+                return;
+            }
+
+            const note = parseInt(document.getElementById('reviewNote').value, 10);
+            const commentaire = document.getElementById('reviewComment').value.trim();
+
+            if (!note || note < 1 || note > 5) {
+                showMessage('reviewMessage', 'Choisissez une note entre 1 et 5.', false);
+                return;
+            }
+
+            try {
+                const response = await fetch('controller/saveCuisinierReviewController.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cuisinier_id: reservationData.user_id_1,
+                        note,
+                        commentaire
+                    })
+                });
+
+                const result = await response.json();
+                showMessage('reviewMessage', result.message, result.success);
+
+                if (result.success) {
+                    await loadReservation();
+                }
+            } catch (error) {
+                console.error('Erreur lors de l’enregistrement de l’avis:', error);
+                showMessage('reviewMessage', 'Une erreur est survenue lors de l’enregistrement de votre avis.', false);
+            }
+        }
+
+        function showMessage(id, message, success) {
+            const element = document.getElementById(id);
+            element.textContent = message;
+            element.className = success
+                ? 'p-4 rounded-lg text-sm mb-4 bg-green-50 border border-green-200 text-green-700'
+                : 'p-4 rounded-lg text-sm mb-4 bg-red-50 border border-red-200 text-red-700';
+            element.classList.remove('hidden');
+        }
+
         // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            checkSession();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkSession();
             initProfileMenu();
-            loadReservation();
+            await loadReservation();
         });
     </script>
 </body>
